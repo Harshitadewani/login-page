@@ -1,0 +1,200 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MediChatbot</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: linear-gradient(135deg, #e8f5e9, #bbdefb); /* Softer gradient */
+            color: #2c3e50;
+            height: 100vh;
+            overflow: hidden;
+        }
+        h1 {
+            text-align: center;
+            color: #2e7d32;
+            margin-top: 20px;
+        }
+        #mainContainer {
+            display: flex;
+            flex: 1; /* Fill the available height */
+            width: 100%;
+            max-width: 1400px;
+            margin: 20px auto;
+            gap: 20px;
+        }
+        #chatContainer {
+            flex: 3;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+        #chatbox { 
+            flex: 1;
+            width: 100%; 
+            border: 1px solid #ccc; 
+            overflow-y: auto; 
+            padding: 10px; 
+            background-color: #f4f4f4;
+            border-radius: 5px; 
+            box-shadow: inset 0 1px 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 15px;
+        }
+        #userInputContainer {
+            display: flex;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+        #userInput { 
+            flex: 3;
+            padding: 10px; 
+            border: 1px solid #ccc; 
+            border-radius: 5px; 
+            font-size: 14px;
+        }
+        button { 
+            flex: 1;
+            padding: 10px; 
+            border: none; 
+            border-radius: 5px; 
+            background-color: #2e7d32; 
+            color: white; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: bold;
+        }
+        button:hover { 
+            background-color: #1b5e20; 
+        }
+        #sidebar {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+        }
+        .message { 
+            margin: 5px 0; 
+        }
+        .user { 
+            color: #34495e; 
+            font-weight: bold; 
+        }
+        .bot { 
+            color: #27ae60; 
+            font-weight: bold; 
+        }
+         #logo {
+            display: block;
+            margin: 0 auto 20px;
+            width: 80px;
+            height: 80px;
+        } 
+        .sidebar-header {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2e7d32; /* Updated header color */
+            margin-bottom: 10px;
+        }
+        .sidebar-content {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #4e342e;
+        }
+       #symbol{
+        display: block;
+        margin: 0 auto;
+       }
+        .disclaimer {
+            margin-top: 20px;
+            font-size: 14px;
+            font-style: italic;
+            color: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <h1>MediChatbot</h1>
+    <div id="mainContainer">
+        <div id="sidebar">
+            <div class="sidebar-header">About MediChatbot</div>
+            <div class="sidebar-content">
+                MediChatbot is your personal medical assistant, here to provide guidance on health-related queries, symptoms, and treatments.
+            </div>
+            <img  src="medical-info.png" width="200px" height="200px" >
+            <div class="sidebar-header">Features</div>
+            <div class="sidebar-content">
+                <ul>
+                    <li>24/7 Assistance</li>
+                    <li>Accurate Medical Information</li>
+                    <li>Powered by AI</li>
+                </ul>
+            </div>
+            <div class="disclaimer">
+                This is a chatbot and not a licensed medical professional. Please consult your doctor before following any advice provided by this assistant.
+            </div>
+        </div>
+
+        <div id="chatContainer">
+           <img id="symbol" src="plus logo.png" width="100px" height="100px">
+            <div id="chatbox"></div>
+            <div id="userInputContainer">
+                <input type="text" id="userInput" placeholder="Type your message...">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            var inputField = document.getElementById("userInput");
+            var message = inputField.value;
+            if (message.trim() === "") return;
+
+            // Display user message
+            var chatbox = document.getElementById("chatbox");
+            chatbox.innerHTML += "<div class='message user'>You: " + message + "</div>";
+            inputField.value = "";
+
+            // Send message to server
+            fetch("/get", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                },
+                body: "msg=" + encodeURIComponent(message)
+            })
+            .then(response => response.text())
+            .then(data => {
+                // Display bot response
+                chatbox.innerHTML += "<div class='message bot'>Bot: " + data + "</div>";
+                chatbox.scrollTop = chatbox.scrollHeight; // Scroll to the bottom
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        // Optional: Add event listener for Enter key
+        document.getElementById("userInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
